@@ -36,4 +36,44 @@ class Deck():
     
         return deck
 
+    def shuffle(self) :
+        return
+
+    def deal_card(self):
+
+        card = self.deck.pop()
+        #count of cards in deck reduced by 1 when card is dealt
+        self.count -= 1
+
+        print("Dealer deals a " + card.__str__() )
+
+        #just pop from the top of the list to deal
+        return card
+
+    def deal_one_card(self):
+
+        if self.count < 1:
+            print ("No more cards to deal")
+            return
+
+        return self.deal_card()
     
+    def sort_deck():
+        return
+    
+    def __str__(self):
+
+        deck = []
+        for i in self.deck:
+            deck.append(i.__str__())
+        
+        return  ("\n".join(deck))
+
+deck1 = Deck()
+
+# print(deck1.deck)
+
+for i in range (53):
+    deck1.deal_one_card()
+
+print(deck1)
