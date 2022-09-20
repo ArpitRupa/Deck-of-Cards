@@ -1,4 +1,6 @@
+from turtle import rt
 from card import Card
+import random
 
 class Deck():
     def __init__(self):
@@ -37,6 +39,23 @@ class Deck():
         return deck
 
     def shuffle(self) :
+
+
+        midpoint = self.count//2
+
+        #maybe a better way to do shuffle count
+        shuffle_count = self.count
+
+        for i in range(shuffle_count):
+            
+            front_half = random.randint(0,midpoint)
+            back_half = random.randint(midpoint+1, self.count-1)
+
+            temp = self.deck[front_half]
+
+            self.deck[front_half] = self.deck[back_half]
+            self.deck[back_half] = temp
+
         return
 
     def deal_card(self):
@@ -47,11 +66,14 @@ class Deck():
 
         print("Dealer deals a " + card.__str__() )
 
+        # print(self.count)
+
         #just pop from the top of the list to deal
         return card
 
     def deal_one_card(self):
 
+        #maybe add a try and exception here later
         if self.count < 1:
             print ("No more cards to deal")
             return
@@ -73,7 +95,9 @@ deck1 = Deck()
 
 # print(deck1.deck)
 
-for i in range (53):
-    deck1.deal_one_card()
+# for i in range (53):
+#     deck1.deal_one_card()
+
+deck1.shuffle()
 
 print(deck1)
