@@ -18,7 +18,7 @@ class Deck():
             #card value is not int if > 10 or is equal to 1
             match i:
                 case 1:
-                    "A"
+                    value ="A"
 
                 case 11:
                     value = "J"
