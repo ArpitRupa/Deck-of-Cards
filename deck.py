@@ -89,6 +89,8 @@ class Deck():
             
             valA = A[0].get_card_value()
             valB = B[0].get_card_value()
+            suitA = A[0].get_suit_weight()
+            suitB = B[0].get_suit_weight()
 
             match valA:
                 case "A":
@@ -115,10 +117,9 @@ class Deck():
                 sorted.append(B[0])
                 B.pop(0)
 
-            # elif valA == valB:
-            #     if A[0].get_suit_weight() > B[0].get_suit_weight():
-            #         sorted.append(B[0])
-            #         B.pop(0)
+            elif valA == valB and suitA < suitB :
+                sorted.append(B[0])
+                B.pop(0)
             else:
                 sorted.append(A[0])
                 A.pop(0)
@@ -178,6 +179,6 @@ print(deck1)
 # print(deck1.deck[0])
 # print(deck1.deck[0].get_suit_weight())
 
-# deck1.sort_deck()
+deck1.sort_deck()
 
-# print(deck1)
+print(deck1)
