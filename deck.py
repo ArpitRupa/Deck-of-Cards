@@ -7,9 +7,6 @@ class Deck():
         self.suits = ["clubs", "hearts", "spades", "diamonds"]
         self.count = 52
         self.deck = self.create_deck()
-        
-        
-
 
     def create_deck(self):
 
@@ -18,8 +15,11 @@ class Deck():
         #13 cards per a suit
         for i in range(1, 14):
             
-            #card value is not int if > 10
+            #card value is not int if > 10 or is equal to 1
             match i:
+                case 1:
+                    "A"
+
                 case 11:
                     value = "J"
                 
