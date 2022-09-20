@@ -4,7 +4,7 @@ import random
 
 class Deck():
     def __init__(self):
-        self.suits = ["clubs", "hearts", "spades", "diamonds"]
+        self.suits = [("diamonds",1), ("clubs",3), ("hearts",2), ("spades",4)]
         self.count = 52
         self.deck = self.create_deck()
 
@@ -34,7 +34,7 @@ class Deck():
 
             #each suit has one card per a value
             for suit in self.suits:
-                deck.append(Card(suit,value))
+                deck.append(Card(suit[0],value,suit[1]))
     
         return deck
 
@@ -79,8 +79,82 @@ class Deck():
             return
 
         return self.deal_card()
+
+
+    def merge(self, A, B):
     
-    def sort_deck():
+        sorted = []
+        
+        while (len (A) > 0 and len(B) > 0):
+            
+            valA = A[0].get_card_value()
+            valB = B[0].get_card_value()
+
+            match valA:
+                case "A":
+                    valA = 1
+                case "J":
+                    valA = 11
+                case "Q":
+                    valA = 12
+                case "K":
+                    valA = 13
+            
+            match valB:
+                case "A":
+                    valB = 1
+                case "J":
+                    valB = 11
+                case "Q":
+                    valB = 12
+                case "K":
+                    valB = 13
+
+
+            if valA > valB:
+                sorted.append(B[0])
+                B.pop(0)
+
+            # elif valA == valB:
+            #     if A[0].get_suit_weight() > B[0].get_suit_weight():
+            #         sorted.append(B[0])
+            #         B.pop(0)
+            else:
+                sorted.append(A[0])
+                A.pop(0)
+                
+        while len(A) > 0:
+            sorted.append(A[0])
+            A.pop(0)
+        
+        while len(B) > 0:
+            sorted.append(B[0])
+            B.pop(0)
+    
+        return sorted
+
+
+    def mergesort(self, cards):
+        
+        if len(cards) == 1:
+            return cards
+        
+        half = int(len(cards)/2)
+        arrayA = cards[:half]
+        arrayB = cards[half:]
+        
+        arrayA = self.mergesort( list (arrayA) )
+        arrayB = self.mergesort( list (arrayB) )
+        
+        return self.merge( arrayA, arrayB)
+
+    
+    #order should be number value followed by spade, clubs, hearts, diamond
+    def sort_deck(self):
+
+        print ("Starting Sort......")
+        self.deck = self.mergesort(self.deck)
+
         return
     
     def __str__(self):
@@ -101,3 +175,9 @@ deck1 = Deck()
 deck1.shuffle()
 
 print(deck1)
+# print(deck1.deck[0])
+# print(deck1.deck[0].get_suit_weight())
+
+# deck1.sort_deck()
+
+# print(deck1)
