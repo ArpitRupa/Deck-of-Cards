@@ -16,6 +16,9 @@ class Card():
 
   def __str__(self):
     return ( str(self.get_card_value()) + " of " + str(self.get_card_suit()) )
+
+  def __repr__(self):
+    return ( str(self.get_card_value()) + " of " + str(self.get_card_suit()) )
     
 # card1= Card("club", "queen")
 
