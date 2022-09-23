@@ -65,7 +65,7 @@ class Deck():
         #count of cards in deck reduced by 1 when card is dealt
         self.count -= 1
 
-        print("Dealer deals a " + card.__str__() )
+        # print("Dealer deals a " + card.__str__() )
 
         # print(self.count)
 
