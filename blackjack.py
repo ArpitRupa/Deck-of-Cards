@@ -16,7 +16,9 @@ class Blackjack():
     def hit_me(self,player, deck):
 
         #deal card and show player hand
-        player.hand.cards.append(deck.deal_card())
+        card = deck.deal_card()
+        print (player.name + " receives a " + str(card) )
+        player.hand.cards.append(card)
         self.show_hand(player)
 
         #if player hand value > 21, the player is bust and removed from play
@@ -33,6 +35,43 @@ class Blackjack():
             self.dealercall = True
 
         return
+
+    #runs after all players are standing or busted    
+    def dealers_turn(self, deck):
+
+        for player in self.players:
+            if player.isDealer:
+                dealerIndex = self.players.index(player)
+                break
+        
+        dealer = self.players[dealerIndex]
+        dealer_hand = dealer.hand.get_cards()
+        print(dealer.name + " shows hidden card. The card was a " + str(dealer_hand[0]) )
+        print("Dealer's current hand: " + str(dealer_hand))
+
+        dealer_active = True
+        while dealer_active:
+            dealer_value = self.get_hand_value(dealer_hand)
+            print( dealer.name + "'s current value: " + str (dealer_value) )
+
+            #dealer must stand if hand value is greater than 16
+            if dealer_value > 16:
+                print ("Dealer's total is greater than or equal to 17, Dealer must stand.")
+                dealer_active = False
+            else:
+                card = deck.deal_card()
+                dealer.hand.cards.append(card)
+                print ("Dealer receives a " + str(card) )
+                print("Dealer's current hand: " + str(dealer_hand))
+
+        print( "Dealer's turn has concluded. Dealer's value is " + str (self.get_hand_value(dealer_hand)) )
+
+        if self.get_hand_value(dealer_hand) > 21:
+            print("The dealer busts.")
+            dealer.bust = True
+        return
+
+
 
     def show_hand(self, player):
         player_hand = player.hand.get_cards()
@@ -72,6 +111,62 @@ class Blackjack():
         return total_val
 
     def check_winner(self):
+
+        winning_players = []
+        tie_players = []
+        losing_players = []
+
+        players = []
+
+        for player in self.players:
+            if player.isDealer:
+
+                dealer_index = self.players.index(player)
+                dealer_hand = player.hand.get_cards()
+                dealer_value = self.get_hand_value(dealer_hand)
+            elif player.bust == False:
+                players.append( player )
+        
+        #if dealer is bust, remaining active players win
+        if self.players[dealer_index].bust:
+            print("Dealer has bust, remaining players win!")
+            print("Winners: " + str(players) )
+            
+            return
+        
+
+        for player in players:
+            
+            hand = player.hand.get_cards()
+            value = self.get_hand_value(hand)
+            print(player.name + " " + str(value) )
+
+            if  value > dealer_value:
+                winning_players.append(player)
+            elif value == dealer_value :
+                tie_players.append(player)
+
+        for player in self.players:
+            if player not in winning_players and player not in tie_players:
+                losing_players.append(player)
+
+        print ("Game has concluded.")
+        
+        if len(winning_players) == 0 and len(tie_players) == 0:
+            print("All players lose.")
+            return
+        
+        if len(winning_players) > 0:
+            print( "Winners: "+ str(winning_players) )
+        
+        if len(tie_players) > 0:
+            print( "Dealer ties with:" + str(tie_players) )
+
+        if len(losing_players) > 0:
+            print("Losers: " + str(losing_players))
+        
+                
+
         return
     
     def start_game(self):
@@ -108,8 +203,21 @@ class Blackjack():
                 #perform one of the two actions
                 if action == "Hit Me":
                     self.hit_me(player, blackjack_deck)
+                    if player.bust:
+                        print("Oops! " + player.name + " has gotten too greedy and busts!")
                 else:
                     self.stand(player)
+                
+                #dealer call if no active players remaining
+                if len (self.activeplayers) < 1 :
+                    self.dealercall = True
+        
+        print("All players are standing or busted...")
+        print ("Dealer's turn has started...")
+        self.dealers_turn(blackjack_deck)
+
+        self.check_winner()
+
                     
 
 
