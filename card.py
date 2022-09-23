@@ -1,9 +1,9 @@
 class Card():
 
-  def __init__(self, suit, value, suitweight):
+  def __init__(self, suit, value, suit_weight):
     self.suit = suit
     self.value = value
-    self.suitWeight = suitweight
+    self.suit_weight = suit_weight
 
   def get_card_value(self):
     return self.value
@@ -12,9 +12,12 @@ class Card():
     return self.suit
 
   def get_suit_weight(self):
-    return self.suitWeight
+    return self.suit_weight
 
   def __str__(self):
+    return ( str(self.get_card_value()) + " of " + str(self.get_card_suit()) )
+
+  def __repr__(self):
     return ( str(self.get_card_value()) + " of " + str(self.get_card_suit()) )
     
 # card1= Card("club", "queen")

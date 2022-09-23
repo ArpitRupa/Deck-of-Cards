@@ -7,6 +7,7 @@ class Deck():
         self.suits = [("diamonds",1), ("clubs",3), ("hearts",2), ("spades",4)]
         self.count = 52
         self.deck = self.create_deck()
+        self.shuffle()
 
     def create_deck(self):
 
@@ -64,7 +65,7 @@ class Deck():
         #count of cards in deck reduced by 1 when card is dealt
         self.count -= 1
 
-        print("Dealer deals a " + card.__str__() )
+        # print("Dealer deals a " + card.__str__() )
 
         # print(self.count)
 
@@ -117,6 +118,7 @@ class Deck():
                 sorted.append(B[0])
                 B.pop(0)
 
+            #if values are equal, compare the suits
             elif valA == valB and suitA < suitB :
                 sorted.append(B[0])
                 B.pop(0)
