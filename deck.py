@@ -7,6 +7,7 @@ class Deck():
         self.suits = [("diamonds",1), ("clubs",3), ("hearts",2), ("spades",4)]
         self.count = 52
         self.deck = self.create_deck()
+        self.shuffle()
 
     def create_deck(self):
 
@@ -117,7 +118,8 @@ class Deck():
                 sorted.append(B[0])
                 B.pop(0)
 
-            elif valA == valB and suitA < suitB :
+            #if values are equal, compare the suits
+            elif valA == valB and suitA > suitB :
                 sorted.append(B[0])
                 B.pop(0)
             else:
@@ -166,19 +168,19 @@ class Deck():
         
         return  ("\n".join(deck))
 
-deck1 = Deck()
+# deck1 = Deck()
 
-# print(deck1.deck)
+# # print(deck1.deck)
 
-# for i in range (53):
-#     deck1.deal_one_card()
+# # for i in range (53):
+# #     deck1.deal_one_card()
 
-deck1.shuffle()
+# deck1.shuffle()
 
-print(deck1)
-# print(deck1.deck[0])
-# print(deck1.deck[0].get_suit_weight())
+# print(deck1)
+# # print(deck1.deck[0])
+# # print(deck1.deck[0].get_suit_weight())
 
-deck1.sort_deck()
+# deck1.sort_deck()
 
-print(deck1)
+# print(deck1)
