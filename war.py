@@ -1,9 +1,7 @@
 from gc import collect
 import copy
-from player import Player
 from deck import Deck
-from card import Card
-from hand import Hand
+
 
 class War():
 
@@ -128,9 +126,6 @@ class War():
                     break
                 card = war_deck.deal_card()
                 player.hand.cards.append(card)
-
-        for player in self.players:
-            print(player.hand.get_cards())
 
 
         while len(self.players) > 1:

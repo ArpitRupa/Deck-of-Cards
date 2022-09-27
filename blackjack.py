@@ -1,7 +1,5 @@
 from player import Player
 from deck import Deck
-from card import Card
-from hand import Hand
 import inquirer
 import re
 
@@ -55,14 +53,19 @@ class Blackjack():
             print( dealer.name + "'s current value: " + str (dealer_value) )
 
             #dealer must stand if hand value is greater than 16
-            if dealer_value > 16:
+            if dealer_value > 16 and dealer_value < 22:
                 print ("Dealer's total is greater than or equal to 17, Dealer must stand.")
                 dealer_active = False
-            else:
+            elif dealer_value < 16:
                 card = deck.deal_card()
                 dealer.hand.cards.append(card)
                 print ("Dealer receives a " + str(card) )
                 print("Dealer's current hand: " + str(dealer_hand))
+            else:
+                print("The dealer busts.")
+                dealer.bust = True
+                return
+
 
         print( "Dealer's turn has concluded. Dealer's value is " + str (self.get_hand_value(dealer_hand)) )
 
