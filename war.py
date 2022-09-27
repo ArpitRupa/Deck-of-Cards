@@ -1,8 +1,6 @@
 from gc import collect
 import copy
 from deck import Deck
-
-
 class War():
 
     def __init__(self):
