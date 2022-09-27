@@ -45,7 +45,7 @@ class Deck():
         midpoint = self.count//2
 
         #maybe a better way to do shuffle count
-        shuffle_count = self.count
+        shuffle_count = self.count*2
 
         for i in range(shuffle_count):
             
@@ -64,10 +64,6 @@ class Deck():
         card = self.deck.pop()
         #count of cards in deck reduced by 1 when card is dealt
         self.count -= 1
-
-        # print("Dealer deals a " + card.__str__() )
-
-        # print(self.count)
 
         #just pop from the top of the list to deal
         return card
@@ -168,19 +164,3 @@ class Deck():
         
         return  ("\n".join(deck))
 
-deck1 = Deck()
-
-# print(deck1.deck)
-
-# for i in range (53):
-#     deck1.deal_one_card()
-
-deck1.shuffle()
-
-print(deck1)
-# print(deck1.deck[0])
-# print(deck1.deck[0].get_suit_weight())
-
-deck1.sort_deck()
-
-print(deck1)

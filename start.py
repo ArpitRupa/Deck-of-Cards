@@ -1,19 +1,51 @@
 from blackjack import Blackjack
 from player import Player
+from war import War
+import inquirer
 
 def main():
     
-    game = Blackjack()
+    game = ""
+    questions = [
+                    inquirer.List('game',
+                    message="What game would you like to play?",
+                    choices=['Blackjack', 'War'],
+                        ),
+                    ]
+    game = inquirer.prompt(questions)['game']
 
-    number_of_players = int(input("How many players are playing? \n"))
+    match game:
+        case "Blackjack":
+            game = Blackjack()
+        case "War":
+            game = War()
 
-    if type(number_of_players) != type(5) or number_of_players < 2 or number_of_players > 8:
-        print ("error...the input value must be an integer between 2-8 \n")
-        return
 
-    for i in range(number_of_players) :
+    #get number of players
 
-        name = input( "Enter name for Player " + str(i+1) +" \n")
+    is_valid = False
+
+    while is_valid is False:
+        number_of_players = input("How many players are playing? \n")
+
+        if number_of_players.strip().isdigit() and int(number_of_players) < 9:
+            is_valid = True
+        else: 
+            print("error...the input value must be an integer between 2-8 \n")
+
+
+    #get names of players
+    for i in range( int(number_of_players) ):
+        
+        valid_name = False
+
+        while valid_name == False:
+
+            name = input( "Enter name for Player " + str(i+1) +" \n")
+
+            if len(name) > 0:
+                valid_name = True
+
         game.players.append(Player(name))
 
     game.start_game()

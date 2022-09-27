@@ -20,6 +20,3 @@ class Card():
   def __repr__(self):
     return ( str(self.get_card_value()) + " of " + str(self.get_card_suit()) )
     
-# card1= Card("club", "queen")
-
-# print(card1.suit)
