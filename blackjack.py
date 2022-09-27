@@ -188,7 +188,7 @@ class Blackjack():
         while (self.dealercall==False):
 
             #go through players and determine their actions
-            for player in self.activeplayers:
+            for player in self.activeplayers[:]:
                 player_hand = player.hand.get_cards()
                 questions = [
                     inquirer.List('action',
