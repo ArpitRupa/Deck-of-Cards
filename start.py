@@ -1,9 +1,24 @@
 from blackjack import Blackjack
 from player import Player
+from war import War
+import inquirer
 
 def main():
     
-    game = Blackjack()
+    game = ""
+    questions = [
+                    inquirer.List('game',
+                    message="What game would you like to play?",
+                    choices=['Blackjack', 'War'],
+                        ),
+                    ]
+    game = inquirer.prompt(questions)['game']
+
+    match game:
+        case "Blackjack":
+            game = Blackjack()
+        case "War":
+            game = War()
 
     number_of_players = int(input("How many players are playing? \n"))
 
