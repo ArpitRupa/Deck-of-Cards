@@ -1,7 +1,7 @@
+from pickle import FALSE
 from tkinter import CENTER
 import pygame
 import os
-
 
 pygame.init()
 
@@ -22,7 +22,6 @@ LIGHT_GREEN = (0, 120, 0)
 RED = (255, 0, 0)
 LIGHT_RED = (120, 0, 0)
 
-FPS = 60
 CARD_HEIGHT, CARD_WIDTH = 185, 131
 
 
@@ -77,12 +76,6 @@ TABLE = pygame.image.load(os.path.join(
     "Assets", "items", "table_top.png")).convert_alpha()
 TABLE = scale_aspect(TABLE, scale)
 
-# rects
-blackjack_rect = blackjack.get_rect(midbottom=(WIDTH/3.2, HEIGHT/1.5))
-war_rect = war.get_rect(midbottom=(WIDTH/1.46, HEIGHT/1.47))
-
-TABLE_RECT = TABLE.get_rect(center=(WIDTH/2, HEIGHT/2))
-
 # texts
 title_text = title_font.render("Deck of Cards", True, 'Black')
 instruction_text = instruction_font.render("Select a game:", True, "Black")
@@ -90,33 +83,89 @@ blackjack_text = game_font.render("BlackJack", True, "Black")
 war_text = game_font.render("War", True, "Black")
 
 
-def update_window():
+# rects
+blackjack_rect = blackjack.get_bounding_rect()
+blackjack_rect.midbottom = (WIDTH/3.2, HEIGHT/1.5)
+
+
+war_rect = war.get_bounding_rect()
+war_rect.midbottom = (WIDTH/1.46, HEIGHT/1.47)
+
+TABLE_RECT = TABLE.get_rect(center=(WIDTH/2, HEIGHT/2))
+
+
+def start_window(BLACKJACK, WAR):
     WINDOW.fill(GREY)
 
     # LOCATION OF RENDER
     WINDOW.blit(TABLE, TABLE_RECT)
-    WINDOW.blit(blackjack, blackjack_rect)
-    WINDOW.blit(war, war_rect)
+    # pygame.draw.rect(WINDOW, RED, blackjack_rect)
+    # pygame.draw.rect(WINDOW, RED, war_rect)
+    WINDOW.blit(blackjack, (blackjack_rect[0]-17, blackjack_rect[1]))
+    WINDOW.blit(war, (war_rect[0]-33, war_rect[1]))
     WINDOW.blit(title_text, ((225/800)*WIDTH, (50/600)*HEIGHT))
     WINDOW.blit(instruction_text, ((300/800)*WIDTH, (180/600)*HEIGHT))
     WINDOW.blit(blackjack_text, ((200/800)*WIDTH, (400/600)*HEIGHT))
     WINDOW.blit(war_text, ((530/800)*WIDTH, (400/600)*HEIGHT))
+
+    if blackjack_rect.collidepoint(pygame.mouse.get_pos()):
+        blackjack.set_alpha(180)
+        blackjack_text.set_alpha(140)
+    else:
+        blackjack.set_alpha(255)
+        blackjack_text.set_alpha(255)
+
+    if war_rect.collidepoint(pygame.mouse.get_pos()):
+        war.set_alpha(180)
+        war_text.set_alpha(140)
+    else:
+        war.set_alpha(255)
+        war_text.set_alpha(255)
+
+    for event in pygame.event.get():
+        # print(pygame.mouse.get_pos())
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            print("player clicked")
+            if blackjack_rect.collidepoint(pygame.mouse.get_pos()):
+                print("Player clicked Blackjack")
+            elif war_rect.collidepoint(pygame.mouse.get_pos()):
+                print("Player clicked War")
+
     pygame.display.update()
+
+
+def start_blackjack():
+    return
+
+
+def start_war():
+    return
 
 
 def main():
 
-    run = True
+    # FPS
+    FPS = 120
+
+    # game states
+    BLACKJACK = False
+    WAR = False
+    RUN = True
 
     game_clock = pygame.time.Clock()
 
-    while run:
-        game_clock.tick(FPS)
+    while RUN:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                RUN = False
 
-        update_window()
+        if not BLACKJACK and not WAR:
+            start_window(BLACKJACK, WAR)
+        elif BLACKJACK:
+            start_blackjack()
+        elif WAR:
+            start_war()
+        # game_clock.tick(FPS)
 
     pygame.quit()
 
