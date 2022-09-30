@@ -39,9 +39,9 @@ class DeckOfCards:
         for event in pygame.event.get():
             num_players.handle_event(event)
 
-        # num_players.update()
+        num_players.update()
         self.render_background(window)
-        # num_players.draw(window.window)
+        num_players.draw(window.window)
         pygame.display.flip()
         # window.window.blit(blackjack_text, ((200/800)*WIDTH, (400/600)*HEIGHT))
         # pygame.display.update()
