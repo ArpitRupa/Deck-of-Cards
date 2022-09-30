@@ -1,5 +1,5 @@
-from player import Player
-from deck import Deck
+from core.player import Player
+from core.deck import Deck
 import inquirer
 import re
 

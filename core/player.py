@@ -1,4 +1,5 @@
-from hand import Hand
+from core.hand import Hand
+
 
 class Player():
 
@@ -8,10 +9,6 @@ class Player():
         self.bust = False
         self.isDealer = dealer
         self.didStand = False
-    
+
     def __repr__(self):
-        return ( self.name )
-
-
-
-    
+        return (self.name)

@@ -1,6 +1,6 @@
 import pygame
 import os
-from uiconfig import WIDTH, HEIGHT, scale_aspect, font_big, font_med, font_small
+from ui.uiconfig import WIDTH, HEIGHT, scale_aspect, font_big, font_med, font_small
 
 
 class Splashscreen:

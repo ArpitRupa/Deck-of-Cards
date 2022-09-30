@@ -1,5 +1,5 @@
 from turtle import rt
-from card import Card
+from core.card import Card
 import random
 
 

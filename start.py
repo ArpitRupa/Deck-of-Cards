@@ -1,6 +1,6 @@
-from blackjack import Blackjack
-from player import Player
-from war import War
+from games.blackjack import Blackjack
+from core.player import Player
+from games.war import War
 import inquirer
 
 

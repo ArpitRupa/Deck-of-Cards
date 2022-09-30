@@ -1,6 +1,6 @@
 import pygame
 import os
-from uiconfig import WIDTH, HEIGHT
+from ui.uiconfig import WIDTH, HEIGHT
 
 
 class Window:

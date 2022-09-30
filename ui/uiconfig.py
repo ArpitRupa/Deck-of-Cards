@@ -42,13 +42,6 @@ LIGHT_RED = (120, 0, 0)
 
 CARD_HEIGHT, CARD_WIDTH = 185, 131
 
-# background-image config
-# TABLE = pygame.image.load(os.path.join(
-#     "Assets", "items", "table_top.png")).convert_alpha()
-# TABLE = scale_aspect(TABLE, scale)
-# TABLE_RECT = TABLE.get_rect(center=(WIDTH/2, HEIGHT/2))
-
-
 # text constants for game
 font_big = pygame.font.Font(None, scale_text(50))
 font_med = pygame.font.Font(None, scale_text(25))
