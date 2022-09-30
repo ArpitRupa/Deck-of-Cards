@@ -32,7 +32,7 @@ class Deck():
                 case 13:
                     value = "K"
 
-                case defaut:
+                case default:
                     value = i
 
             # each suit has one card per a value
