@@ -3,6 +3,8 @@ import os
 from ui.uiconfig import WIDTH, HEIGHT, scale_aspect, font_big, font_med, font_small
 
 
+# object to hold the values for the start window
+
 class Splashscreen:
 
     def __init__(self) -> None:

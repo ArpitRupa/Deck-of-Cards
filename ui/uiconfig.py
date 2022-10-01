@@ -1,6 +1,8 @@
 import pygame
 import os
 
+# helper methods
+
 
 def scale_aspect(image, scale):
     # https://www.delftstack.com/howto/python-pygame/scale-images-in-pygame/
@@ -17,6 +19,11 @@ def scale_aspect(image, scale):
     )
 
     return image
+
+
+def create_text_surface(text, size):
+    font = pygame.font.Font(None, size)
+    return font.render(text, True, "Black")
 
 
 def scale_text(size):
