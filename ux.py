@@ -1,11 +1,13 @@
+import os
+import pygame
+from textbox import Textbox
+from personinput import PersonInput
 from ui.splashscreen import Splashscreen
 from ui.startwindow import start_window
 from ui.gamewindow import Window
 from ui.uiconfig import WIDTH, HEIGHT, scale, scale_aspect, GREY, create_text_surface
 from games.blackjack import Blackjack
-from textbox import Textbox
-import pygame
-import os
+from personinput import PersonInput
 
 
 class DeckOfCards:
@@ -24,14 +26,20 @@ class DeckOfCards:
         self.table_rect = self.table.get_rect(center=(WIDTH/2, HEIGHT/2))
 
         # states for game intialization
-        self.get_num_players = True
+        self.num_players_text = None
+        self.got_count = False
 
         # how many players
-        self.num_players = 0
-        # names of players
-        self.players = []
+        self.player_count = 0
+        # dict of players' textbox
+        self.player_text_dict = {}
+        # track active player's text box
+        self.active_player = 1
 
+        # store events of game
         self.events = None
+        # state to help know when we're done getting inputs
+        self.got_all_input = False
 
     # render the background
 
@@ -39,38 +47,95 @@ class DeckOfCards:
         window.window.fill(GREY)
         window.window.blit(self.table, self.table_rect)
 
-    def start_blackjack(self, window, game):
-
-        self.render_background(window)
-        # num_players.render_textbox(window.window)
-
-        # create textbox to get num of players
-        if self.num_players == 0:
-            print("is none")
-            num_players = Textbox(520, 450, 300, 100, input_type="int")
-            # run it once
-            self.num_players = num_players
-
-        for event in game.events:
-            self.num_players.handle_event(event)
-
-        self.num_players.update()
-        self.num_players.draw(window.window)
+    def render_title(self, window):
         game_title = create_text_surface(
             self.game_title, 100)
-        ask_num_players = create_text_surface(
-            "How many players are playing?", 75)
-        window.window.blit(game_title, (435, (50/600)*HEIGHT))
-        window.window.blit(
-            ask_num_players, (225, (180/600)*HEIGHT))
+        title_rect = game_title.get_rect()
+        title_rect.midbottom = (WIDTH/2, HEIGHT*.17)
+        window.window.blit(game_title, title_rect)
+
+    def initalize_game(self, window):
+
+        self.render_background(window)
+        self.render_title(window)
+
+        if not self.got_all_input:
+            active_player = self.active_player
+            # create textbox to get num of players
+            if self.num_players_text is None:
+                num_players = Textbox(520, 450, 300, 100, input_type="int")
+                # run it once
+                self.num_players_text = num_players
+
+            # need to add player count bounds
+            if self.num_players_text.valid_input() and not self.got_count:
+                self.player_count = int(self.num_players_text.text)
+                self.got_count = True
+                for i in range(self.player_count):
+                    self.player_text_dict[i+1] = PersonInput()
+
+            # only ask for num of players and render text box if we have not got the count
+            if not self.got_count:
+                for event in self.events:
+                    self.num_players_text.handle_event(event)
+                ask_num_players = create_text_surface(
+                    "How many players are playing?", 75)
+                self.num_players_text.update()
+                self.num_players_text.draw(window.window)
+                window.window.blit(
+                    ask_num_players, (225, (180/600)*HEIGHT))
+
+            # output error text if input was not numerical int
+            if not self.num_players_text.valid_enter:
+                error_text = create_text_surface(
+                    "Please prvoide an integer value.", 50, "firebrick2")
+                window.window.blit(error_text, (350, 575))
+
+            # render text box for each player input
+            if self.player_count > 0 and self.active_player <= self.player_count:
+                current_player = self.player_text_dict[active_player]
+
+                # only make textbox if th PersonInput object does not have a textbox
+                if current_player.input_text is None:
+                    player_text = Textbox(500, 450, 300, 100)
+                    current_player.input_text = player_text
+
+                if not current_player.got_name and self.got_count:
+                    for event in self.events:
+                        current_player.input_text.handle_event(event)
+                    ask_player_name = create_text_surface(
+                        "Enter Name of Player " + str(active_player), 75)
+                    current_player.input_text.update()
+                    current_player.input_text.draw(window.window)
+                    window.window.blit(
+                        ask_player_name, (300, (180/600)*HEIGHT))
+
+                if current_player.input_text.valid_input():
+                    current_player.gotname = True
+                    self.player_text_dict[active_player] = current_player.input_text.text
+                    self.active_player += 1
+
+                    if self.active_player > self.player_count:
+                        self.got_all_input = True
+        else:
+            if self.got_all_input:
+                if self.game_title == "Blackjack":
+                    self.run_blackjack(window)
+                elif self.game_title == "War":
+                    self.run_war(window)
 
         pygame.display.flip()
 
         return
 
-    def start_war(self, window):
+    def run_blackjack(self, window):
         self.render_background(window)
-        # window.window.blit(war_text, ((200/800)*WIDTH, (400/600)*HEIGHT))
+        self.render_title(window)
+        return
+
+    def run_war(self, window):
+        self.render_background(window)
+        self.render_title(window)
         return
 
 
@@ -80,7 +145,6 @@ def main():
     window = Window("Deck of Cards")
     splash_screen = Splashscreen()
     game = DeckOfCards()
-    num_players = Textbox(520, 450, 300, 100)
 
     RUN = True
 
@@ -96,11 +160,9 @@ def main():
         # continue displaying splash screen if no game is selected
         if game.game_title == "":
             start_window(window, splash_screen, game)
-        # else start the game that has a the value "True" in the dictionary
-        elif game.game_title == "Blackjack":
-            game.start_blackjack(window, game)
-        elif game.game_title == "War":
-            game.start_war(window)
+        # else initalize the game (get some inputs)
+        else:
+            game.initalize_game(window)
 
     pygame.quit()
 

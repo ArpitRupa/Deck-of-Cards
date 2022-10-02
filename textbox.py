@@ -40,27 +40,22 @@ class Textbox:
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            print("clicked")
             if self.rect.collidepoint(pygame.mouse.get_pos()):
-                print("Clicked box")
                 self.active = True
             else:
                 self.active = False
 
         if self.active and event.type == pygame.KEYDOWN:
-            print("Entered:" + event.unicode)
             if event.key == pygame.K_BACKSPACE:
                 if len(self.text) > 0:
                     self.text = self.text[:-1]
             elif (event.key == pygame.K_ESCAPE):
                 self.active = False
-            elif (event.key == pygame.K_KP_ENTER):
+            elif (event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER):
                 self.enter_pressed = True
                 self.handle_enter()
             else:
                 self.text += event.unicode
-
-            print("Current word: " + self.text)
 
         self.surface = self.make_font_surface()
         return
@@ -96,9 +91,18 @@ class Textbox:
         return
 
     def handle_enter(self):
+
         if self.input_type is not None:
             if self.input_type == "int":
                 if self.text.isnumeric():
                     self.valid_enter = True
                 else:
                     self.text = ""
+                    self.valid_enter = False
+                    self.enter_pressed = False
+
+    def valid_input(self):
+        if self.valid_enter and self.enter_pressed:
+            return True
+        else:
+            return False

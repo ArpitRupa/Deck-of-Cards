@@ -21,9 +21,9 @@ def scale_aspect(image, scale):
     return image
 
 
-def create_text_surface(text, size):
+def create_text_surface(text, size, color="Black"):
     font = pygame.font.Font(None, size)
-    return font.render(text, True, "Black")
+    return font.render(text, True, color)
 
 
 def scale_text(size):
