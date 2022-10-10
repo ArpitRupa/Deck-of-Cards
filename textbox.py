@@ -1,8 +1,6 @@
-from cgitb import text
-from sre_parse import WHITESPACE
 import pygame
 import time
-from ui.uiconfig import WHITE, font_med, font_big
+from ui.uiconfig import WHITE, font_med
 
 
 class Textbox:
@@ -19,6 +17,7 @@ class Textbox:
         self.cursor = self.make_cursor()
         self.enter_pressed = False
         self.valid_enter = True
+        self.text_was_empty = False
         self.input_type = input_type
 
     def make_rect(self, x, y, width, height):
@@ -45,17 +44,23 @@ class Textbox:
             else:
                 self.active = False
 
-        if self.active and event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_BACKSPACE:
-                if len(self.text) > 0:
-                    self.text = self.text[:-1]
-            elif (event.key == pygame.K_ESCAPE):
-                self.active = False
-            elif (event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER):
-                self.enter_pressed = True
-                self.handle_enter()
+        if event.type == pygame.KEYDOWN:
+            if self.active:
+                if event.key == pygame.K_BACKSPACE:
+                    if len(self.text) > 0:
+                        self.text = self.text[:-1]
+                elif (event.key == pygame.K_ESCAPE):
+                    self.active = False
+                elif (event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER):
+                    self.enter_pressed = True
+                    self.check_if_empty()
+                    self.handle_enter()
+                else:
+                    self.text += event.unicode
             else:
-                self.text += event.unicode
+                # make active on enter press if not active
+                if (event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER):
+                    self.active = True
 
         self.surface = self.make_font_surface()
         return
@@ -73,14 +78,14 @@ class Textbox:
 
         self.rect.w = max(150, self.surface.get_width() + 10)
 
-    def draw(self, screen):
+    def draw(self, screen) -> None:
         pygame.draw.rect(screen, self.color, self.rect)
         screen.blit(self.surface, (self.rect.x+5, self.rect.y+5))
 
         if self.active:
             self.handle_cursor(screen)
 
-    def handle_cursor(self, screen):
+    def handle_cursor(self, screen) -> None:
 
         if time.time() % 1 > .5:
             text_rect = self.surface.get_rect(
@@ -90,19 +95,27 @@ class Textbox:
 
         return
 
-    def handle_enter(self):
+    def handle_enter(self) -> None:
+        if len(self.text) > 0:
+            if self.input_type is not None:
+                if self.input_type == "int":
+                    if self.text.isnumeric():
+                        self.valid_enter = True
+                    else:
+                        self.text = ""
+                        self.valid_enter = False
+                        self.enter_pressed = False
 
-        if self.input_type is not None:
-            if self.input_type == "int":
-                if self.text.isnumeric():
-                    self.valid_enter = True
-                else:
-                    self.text = ""
-                    self.valid_enter = False
-                    self.enter_pressed = False
+    # check if input is empty or just spaces
+    def check_if_empty(self) -> None:
+        if self.text and self.text.strip():
+            self.text_was_empty = False
+        else:
+            self.text_was_empty = True
+            self.enter_pressed = False
 
-    def valid_input(self):
-        if self.valid_enter and self.enter_pressed:
+    def valid_input(self) -> bool:
+        if self.valid_enter and self.enter_pressed and not self.text_was_empty:
             return True
         else:
             return False

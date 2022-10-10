@@ -44,7 +44,7 @@ def start_window(window, splash_screen, game):
     # check which game the player clicks on
     for event in game.events:
         if event.type == pygame.MOUSEBUTTONDOWN:
-            # change state based on which icon is clicked
+            # change game based on which icon is clicked
             if blackjack_rect.collidepoint(pygame.mouse.get_pos()):
                 game.game_title = "Blackjack"
             elif war_rect.collidepoint(pygame.mouse.get_pos()):
