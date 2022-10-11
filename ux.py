@@ -1,6 +1,6 @@
-from multiprocessing import Event
 import os
 import pygame
+from games.blackjack import Blackjack
 from textbox import Textbox
 from ui.splashscreen import Splashscreen
 from ui.startwindow import start_window
@@ -42,6 +42,9 @@ class DeckOfCards:
         # state to only set coords for players once
         self.coords_set: bool = False
 
+        self.game_started: bool = False
+        self.game = None
+
     # render the background
 
     def render_background(self, window):
@@ -57,10 +60,9 @@ class DeckOfCards:
 
     def initalize_game(self, window):
 
-        self.render_background(window)
-        self.render_title(window)
-
         if not self.got_all_input:
+            self.render_background(window)
+            self.render_title(window)
             active_player = self.active_player
             # create textbox to get num of players
             if self.num_players_text is None:
@@ -93,8 +95,8 @@ class DeckOfCards:
             # output error text if input was not numerical int
             if not self.num_players_text.valid_enter:
                 error_text = create_text_surface(
-                    "Please prvoide an integer value.", 50, "firebrick2")
-                window.window.blit(error_text, (350, 575))
+                    "Please prvoide an integer value between 2-8.", 50, "firebrick2")
+                window.window.blit(error_text, (250, 575))
 
             # no empty inputs
             if self.num_players_text.text_was_empty:
@@ -132,11 +134,6 @@ class DeckOfCards:
                         self.got_all_input = True
         else:
             if self.got_all_input:
-                if not self.coords_set:
-                    for i in self.player_dict:
-                        self.player_dict[i].update_name_surface()
-                        self.player_dict[i].set_ui_coordinates()
-                    self.coords_set = True
                 if self.game_title == "Blackjack":
                     self.run_blackjack(window)
                 elif self.game_title == "War":
@@ -146,11 +143,36 @@ class DeckOfCards:
 
         return
 
-    def run_blackjack(self, window):
-        self.render_background(window)
-        self.render_title(window)
-        for i in self.player_dict:
-            self.player_dict[i].display_name(window)
+    # set coords for UIPlayers
+    def init_table(self) -> None:
+        if not self.coords_set:
+            for i in self.player_dict:
+                self.player_dict[i].update_name_surface()
+                self.player_dict[i].set_ui_coordinates()
+            self.coords_set = True
+
+    def run_blackjack(self, window) -> None:
+
+        # run once when game hasn't started
+        if not self.game:
+            self.render_background(window)
+            self.render_title(window)
+            self.game = Blackjack()
+            # create and add dealer to the list of players
+            self.player_dict[0] = UIPlayer("Dealer", dealer=True)
+            self.game.players[0] = self.player_dict[0]
+            self.init_table()
+            for i in self.player_dict:
+                self.player_dict[i].display_name(window)
+                if i > 0:
+                    self.game.players.append(self.player_dict[i])
+            self.game.start_game()
+
+        for player in self.game.players:
+            player.create_UI_cards()
+            for card in player.ui_cards:
+                card.display_cards(window)
+
         return
 
     def run_war(self, window):

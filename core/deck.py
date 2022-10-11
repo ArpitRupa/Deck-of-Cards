@@ -5,8 +5,8 @@ import random
 
 class Deck():
     def __init__(self):
-        self.suits = [("diamonds", 1), ("clubs", 3),
-                      ("hearts", 2), ("spades", 4)]
+        self.suits = [("diamond", 1), ("club", 3),
+                      ("heart", 2), ("spade", 4)]
         self.count = 52
         self.deck = self.create_deck()
         self.shuffle()

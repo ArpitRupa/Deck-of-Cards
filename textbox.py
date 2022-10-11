@@ -99,7 +99,7 @@ class Textbox:
         if len(self.text) > 0:
             if self.input_type is not None:
                 if self.input_type == "int":
-                    if self.text.isnumeric():
+                    if self.text.isnumeric() and int(self.text) > 1 and int(self.text) < 8:
                         self.valid_enter = True
                     else:
                         self.text = ""
