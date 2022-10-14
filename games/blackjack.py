@@ -7,7 +7,7 @@ import re
 class Blackjack():
 
     def __init__(self):
-        self.players = [Player("Dealer", dealer=True)]
+        self.players = []
         self.activeplayers = []
         self.cardvalues = {"J": 10, "Q": 10, "K": 10, "A": 11}
         self.dealercall = False
@@ -191,7 +191,7 @@ class Blackjack():
         while (self.dealercall == False):
 
             # go through players and determine their actions
-            for player in self.activeplayers[:]:
+            for player in self.activeplayers:
                 player_hand = player.hand.get_cards()
                 questions = [
                     inquirer.List('action',

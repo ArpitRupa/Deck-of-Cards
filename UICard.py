@@ -18,7 +18,7 @@ class UICard():
             "Assets", "Cards", self.suit+"_"+str(self.value)+".png")).convert_alpha(), .50)
 
     def set_pixel_rect(self) -> pygame.Surface:
-        return self.image.get_bounding_rect(0)
+        return self.image.get_bounding_rect()
 
     # def set_trimmed_surface(self) -> pygame.Rect:
     #     return pygame.Surface(self.pixel_rect.size)

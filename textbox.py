@@ -79,7 +79,9 @@ class Textbox:
         self.rect.w = max(150, self.surface.get_width() + 10)
 
     def draw(self, screen) -> None:
+        # text box rect
         pygame.draw.rect(screen, self.color, self.rect)
+        # text in the box
         screen.blit(self.surface, (self.rect.x+5, self.rect.y+5))
 
         if self.active:

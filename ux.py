@@ -2,6 +2,7 @@ import os
 import pygame
 from games.blackjack import Blackjack
 from textbox import Textbox
+from blackjackactionbox import BlackjackActionBox
 from ui.splashscreen import Splashscreen
 from ui.startwindow import start_window
 from ui.gamewindow import Window
@@ -152,7 +153,6 @@ class DeckOfCards:
             self.coords_set = True
 
     def run_blackjack(self, window) -> None:
-
         # run once when game hasn't started
         if not self.game:
             self.render_background(window)
@@ -160,7 +160,7 @@ class DeckOfCards:
             self.game = Blackjack()
             # create and add dealer to the list of players
             self.player_dict[0] = UIPlayer("Dealer", dealer=True)
-            self.game.players[0] = self.player_dict[0]
+            self.game.players.append(self.player_dict[0])
             self.init_table()
             for i in self.player_dict:
                 self.player_dict[i].display_name(window)
@@ -168,10 +168,18 @@ class DeckOfCards:
                     self.game.players.append(self.player_dict[i])
             self.game.start_game()
 
+        game = self.game
+
         for player in self.game.players:
             player.create_UI_cards()
             for card in player.ui_cards:
                 card.display_cards(window)
+
+        # while not game.dealercall:
+        #     for player in game.activeplayers:
+        #         player_hand = player.hand.get_cards()
+        action_box = BlackjackActionBox()
+        action_box.draw(window)
 
         return
 
@@ -205,6 +213,8 @@ def main():
         # else initalize the game (get some inputs)
         else:
             game.initalize_game(window)
+
+        pygame.display.update()
 
     pygame.quit()
 
