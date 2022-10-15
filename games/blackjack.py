@@ -11,8 +11,11 @@ class Blackjack():
         self.activeplayers = []
         self.cardvalues = {"J": 10, "Q": 10, "K": 10, "A": 11}
         self.dealercall = False
+        self.deck: Deck = None
 
-    def hit_me(self, player, deck):
+    def hit_me(self, player):
+
+        deck = self.deck
 
         # deal card and show player hand
         card = deck.deal_card()
@@ -175,6 +178,7 @@ class Blackjack():
     def start_game(self):
 
         blackjack_deck = Deck()
+        self.deck = blackjack_deck
 
         # deal 2 cards to all of the players
         for n in range(2):
@@ -187,35 +191,35 @@ class Blackjack():
             if player.isDealer == False:
                 self.activeplayers.append(player)
 
-        # while there are still players not busted or standed
-        while (self.dealercall == False):
+        # # while there are still players not busted or standed
+        # while (self.dealercall == False):
 
-            # go through players and determine their actions
-            for player in self.activeplayers:
-                player_hand = player.hand.get_cards()
-                questions = [
-                    inquirer.List('action',
-                                  message="What would " + player.name + " like to do? Current value: " +
-                                  str(self.get_hand_value(player_hand)),
-                                  choices=['Hit Me', 'Stand'],
-                                  ),
-                ]
-                action = inquirer.prompt(questions)['action']
+        #     # go through players and determine their actions
+        #     for player in self.activeplayers:
+        #         player_hand = player.hand.get_cards()
+        #         questions = [
+        #             inquirer.List('action',
+        #                           message="What would " + player.name + " like to do? Current value: " +
+        #                           str(self.get_hand_value(player_hand)),
+        #                           choices=['Hit Me', 'Stand'],
+        #                           ),
+        #         ]
+        #         action = inquirer.prompt(questions)['action']
 
-                print(player.name + " selected " + str(action))
+        #         print(player.name + " selected " + str(action))
 
-                # perform one of the two actions
-                if action == "Hit Me":
-                    self.hit_me(player, blackjack_deck)
-                    if player.bust:
-                        print("Oops! " + player.name +
-                              " has gotten too greedy and busts!")
-                else:
-                    self.stand(player)
+        #         # perform one of the two actions
+        #         if action == "Hit Me":
+        #             self.hit_me(player)
+        #             if player.bust:
+        #                 print("Oops! " + player.name +
+        #                       " has gotten too greedy and busts!")
+        #         else:
+        #             self.stand(player)
 
-                # dealer call if no active players remaining
-                if len(self.activeplayers) < 1:
-                    self.dealercall = True
+        #         # dealer call if no active players remaining
+        #         if len(self.activeplayers) < 1:
+        #             self.dealercall = True
 
         print("All players are standing or busted...")
         print("Dealer's turn has started...")

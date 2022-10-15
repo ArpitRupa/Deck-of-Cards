@@ -32,19 +32,25 @@ class DeckOfCards:
         # how many players
         self.player_count: int = 0
         # dict of players
-        self.player_dict = {}
+        self.player_dict: dict = {}
         # track active player's text box
         self.active_player: int = 1
 
+        self.current_player: UIPlayer
+        self.prev_player: UIPlayer
+
         # store events of game
-        self.events = None
+        self.events: pygame.event = None
         # state to help know when we're done getting inputs
         self.got_all_input: bool = False
         # state to only set coords for players once
         self.coords_set: bool = False
+        self.action_box = None
 
         self.game_started: bool = False
         self.game = None
+
+        self.game_over: bool = False
 
     # render the background
 
@@ -71,11 +77,7 @@ class DeckOfCards:
                 # run it once
                 self.num_players_text = num_players
 
-            #####
-            #####
-            # need to add player count boundss
-            #####
-            #####
+            # check if the input is num and valid
             if self.num_players_text.valid_input() and not self.got_count:
                 self.player_count = int(self.num_players_text.text)
                 self.got_count = True
@@ -126,6 +128,7 @@ class DeckOfCards:
                         ask_player_name, (300, (180/600)*HEIGHT))
                     current_player.set_player_number(int(active_player))
 
+                # check if the player name is valid
                 if current_player.input_text.valid_input():
                     current_player.gotname = True
                     self.player_dict[active_player].name = current_player.input_text.text
@@ -158,28 +161,76 @@ class DeckOfCards:
             self.render_background(window)
             self.render_title(window)
             self.game = Blackjack()
+
             # create and add dealer to the list of players
             self.player_dict[0] = UIPlayer("Dealer", dealer=True)
             self.game.players.append(self.player_dict[0])
+
+            # set coords for UIplayers
             self.init_table()
+
+            # append all players to game list of players
             for i in self.player_dict:
                 self.player_dict[i].display_name(window)
                 if i > 0:
                     self.game.players.append(self.player_dict[i])
+
+            # start the game
             self.game.start_game()
+
+            self.current_player = self.game.activeplayers[0]
+            self.prev_player = self.game.activeplayers[1]
+            player = self.current_player
+            self.action_box = BlackjackActionBox(player.name)
+            self.action_box.update_value(
+                self.game.get_hand_value(player.hand.get_cards()))
+
+        if not self.game_over:
+            for player in self.game.players:
+                player.create_UI_cards()
+                for card in player.ui_cards:
+                    card.display_cards(window)
+            self.game_over = True
 
         game = self.game
 
-        for player in self.game.players:
-            player.create_UI_cards()
-            for card in player.ui_cards:
-                card.display_cards(window)
+        self.action_box.draw(window)
 
-        # while not game.dealercall:
-        #     for player in game.activeplayers:
-        #         player_hand = player.hand.get_cards()
-        action_box = BlackjackActionBox()
-        action_box.draw(window)
+        if not game.dealercall:
+
+            if self.current_player == self.prev_player:
+                # update the index of current player
+                current_index = self.active_player + 1
+                if current_index >= len(game.activeplayers):
+                    self.current_player = game.activeplayers[0]
+                else:
+                    self.current_player = game.activeplayers[current_index]
+
+                player = self.current_player
+                # update UI elements in action box
+                self.action_box.update_player(
+                    player.name)
+                self.action_box.update_value(
+                    self.game.get_hand_value(player.hand.get_cards()))
+                # false to re-render cards next loop
+                self.game_over = False
+
+            self.active_player = game.activeplayers.index(self.current_player)
+            # get the player action
+            for event in self.events:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    # check if mouse is currently over the hit button
+                    if self.action_box.hover_hit:
+                        game.hit_me(self.current_player)
+                        self.prev_player = self.current_player
+
+                    # check if mouse is currently over the stand button
+                    elif self.action_box.hover_stand:
+                        game.stand(self.current_player)
+                        self.prev_player = self.current_player
+
+            if len(game.activeplayers) < 1:
+                game.dealercall = True
 
         return
 
