@@ -1,4 +1,5 @@
 import pygame
+from button import Button
 from ui.uiconfig import create_text_surface, GREY
 
 
@@ -11,14 +12,8 @@ class BlackjackActionBox():
         self.value_surf: pygame.Surface = self.update_value()
         self.value_rect: pygame.Rect
         self.background_surf: pygame.Surface = self.init_background_surf()
-        self.hit_surf: pygame.Surface
-        self.hit_rect: pygame.Rect = self.init_hit_rect()
-        self.stand_surf: pygame.Surface
-        self.stand_rect: pygame.Rect = self.init_stand_rect()
-        self.stand_fill: tuple = (230, 227, 80)
-        self.hit_fill: tuple = (230, 227, 80)
-        self.hover_hit: bool = False
-        self.hover_stand: bool = False
+        self.hit_button: Button = Button(name="Hit", center=(1070, 813))
+        self.stand_button: Button = Button(name="Stand", center=(1070, 863))
 
     # init the box's background
     def init_background_surf(self) -> pygame.Surface:
@@ -38,27 +33,6 @@ class BlackjackActionBox():
         # top-right down
         pygame.draw.rect(window.window, "Black", (1185, 700, 5, 188))
         return
-
-    # helper method to make button rects
-    def create_action_rect(self, surf: pygame.Surface, x: int, y: int) -> pygame.Rect:
-        rect = surf.get_rect(center=(x, y))
-        return rect
-
-    # init hit rect for the class
-    def init_hit_rect(self) -> pygame.Rect:
-        hit_text = create_text_surface("Hit Me", 40)
-        hit_rect = self.create_action_rect(hit_text, 1070, 813)
-        self.hit_surf = hit_text
-
-        return hit_rect
-
-    # init stand rect for the class
-    def init_stand_rect(self) -> pygame.Rect:
-        stand_text = create_text_surface("Stand", 40)
-        stand_rect = self.create_action_rect(stand_text, 1070, 863)
-        self.stand_surf = stand_text
-
-        return stand_rect
 
     # updates player name
     def update_player(self, name) -> None:
@@ -96,62 +70,16 @@ class BlackjackActionBox():
 
         return value
 
-    # checks if mouse is over buttons
-    def handle_hover(self, rect, button: str) -> None:
-
-        hover = False
-        if rect.collidepoint(pygame.mouse.get_pos()):
-            fill_to_change = GREY
-            hover = True
-        else:
-            fill_to_change = (230, 227, 80)
-            hover = False
-        match button:
-            case "Hit":
-                self.hit_fill = fill_to_change
-                self.hover_hit = hover
-            case "Stand":
-                self.stand_fill = fill_to_change
-                self.hover_stand = hover
-        return
-
-    # creates a border rect for a rect
-    def create_outer_rect(self, rect: pygame.Rect, scale: int = 10) -> pygame.Rect:
-        outer_rect = rect.copy()
-
-        outer_rect.width = outer_rect.width+scale
-        outer_rect.height = outer_rect.height+scale
-        outer_rect.x = outer_rect.x - scale/2
-        outer_rect.y = outer_rect.y - scale/2
-
-        return outer_rect
-
     def draw(self, window) -> None:
 
         self.update_player_text()
 
-        # make rects for button borders
-        outer_rect_hit = self.create_outer_rect(self.hit_rect, scale=12)
-        outer_rect_stand = self.create_outer_rect(self.stand_rect, scale=12)
-
-        # check if mouse is hovering over buttons
-        self.handle_hover(rect=self.hit_rect, button="Hit")
-        self.handle_hover(rect=self.stand_rect,  button="Stand")
-
         # draw border around action box
         self.draw_box_border(window)
-        # borders around "hit" and "stand" buttons
-        pygame.draw.rect(window.window, "Black", outer_rect_hit)
-        pygame.draw.rect(window.window, "Black", outer_rect_stand)
 
-        # fill of the 2 buttons
-        pygame.draw.rect(window.window,
-                         self.stand_fill, self.stand_rect)
-        pygame.draw.rect(window.window, self.hit_fill, self.hit_rect)
-
-        # display the buttons' text
-        window.window.blit(self.hit_surf, self.hit_rect)
-        window.window.blit(self.stand_surf, self.stand_rect)
+        # draw the hit and stand buttons
+        self.hit_button.draw(window)
+        self.stand_button.draw(window)
 
         # display current player name
         self.background_surf.blit(

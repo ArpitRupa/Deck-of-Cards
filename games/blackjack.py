@@ -1,3 +1,5 @@
+from tkinter.messagebox import NO
+from core.hand import Hand
 from core.player import Player
 from core.deck import Deck
 import inquirer
@@ -6,14 +8,14 @@ import re
 
 class Blackjack():
 
-    def __init__(self):
-        self.players = []
-        self.activeplayers = []
-        self.cardvalues = {"J": 10, "Q": 10, "K": 10, "A": 11}
-        self.dealercall = False
+    def __init__(self) -> None:
+        self.players: list[Player] = []
+        self.activeplayers: list[Player] = []
+        self.cardvalues: dict = {"J": 10, "Q": 10, "K": 10, "A": 11}
+        self.dealercall: bool = False
         self.deck: Deck = None
 
-    def hit_me(self, player):
+    def hit_me(self, player: Player) -> None:
 
         deck = self.deck
 
@@ -29,8 +31,9 @@ class Blackjack():
             self.activeplayers.remove(player)
         return
 
-    def stand(self, player):
+    def stand(self, player: Player) -> None:
         self.activeplayers.remove(player)
+        player.didStand = True
 
         # if no more active players, the dealer calls
         if len(self.activeplayers) < 1:
@@ -39,7 +42,7 @@ class Blackjack():
         return
 
     # runs after all players are standing or busted
-    def dealers_turn(self, deck):
+    def dealers_turn(self, deck: Deck) -> None:
 
         for player in self.players:
             if player.isDealer:
@@ -80,7 +83,7 @@ class Blackjack():
             dealer.bust = True
         return
 
-    def show_hand(self, player):
+    def show_hand(self, player: Player) -> None:
         player_hand = player.hand.get_cards()
 
         # dealer always hides one card until the end
@@ -93,7 +96,7 @@ class Blackjack():
                   " for a total value of " + str(self.get_hand_value(player_hand)))
         return
 
-    def get_hand_value(self, hand):
+    def get_hand_value(self, hand: Hand) -> int:
 
         total_val = 0
         # track # of aces to optimize 1 vs 11 value for card
@@ -119,7 +122,7 @@ class Blackjack():
 
         return total_val
 
-    def check_winner(self):
+    def check_winner(self) -> None:
 
         winning_players = []
         tie_players = []
@@ -138,6 +141,8 @@ class Blackjack():
 
         # if dealer is bust, remaining active players win
         if self.players[dealer_index].bust:
+            dealer_hand = str(self.players[dealer_index].hand.get_cards())
+            print("Dealer cards:" + dealer_hand)
             print("Dealer has bust, remaining players win!")
             print("Winners: " + str(players))
 
@@ -191,38 +196,9 @@ class Blackjack():
             if player.isDealer == False:
                 self.activeplayers.append(player)
 
-        # # while there are still players not busted or standed
-        # while (self.dealercall == False):
-
-        #     # go through players and determine their actions
-        #     for player in self.activeplayers:
-        #         player_hand = player.hand.get_cards()
-        #         questions = [
-        #             inquirer.List('action',
-        #                           message="What would " + player.name + " like to do? Current value: " +
-        #                           str(self.get_hand_value(player_hand)),
-        #                           choices=['Hit Me', 'Stand'],
-        #                           ),
-        #         ]
-        #         action = inquirer.prompt(questions)['action']
-
-        #         print(player.name + " selected " + str(action))
-
-        #         # perform one of the two actions
-        #         if action == "Hit Me":
-        #             self.hit_me(player)
-        #             if player.bust:
-        #                 print("Oops! " + player.name +
-        #                       " has gotten too greedy and busts!")
-        #         else:
-        #             self.stand(player)
-
-        #         # dealer call if no active players remaining
-        #         if len(self.activeplayers) < 1:
-        #             self.dealercall = True
-
+    def dealer_call(self) -> None:
         print("All players are standing or busted...")
         print("Dealer's turn has started...")
-        self.dealers_turn(blackjack_deck)
+        self.dealers_turn(self.deck)
 
         self.check_winner()
