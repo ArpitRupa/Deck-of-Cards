@@ -2,8 +2,7 @@ from tkinter.messagebox import NO
 from core.hand import Hand
 from core.player import Player
 from core.deck import Deck
-import inquirer
-import re
+from logwindow import LogWindow
 
 
 class Blackjack():
@@ -15,7 +14,7 @@ class Blackjack():
         self.dealercall: bool = False
         self.deck: Deck = None
 
-    def hit_me(self, player: Player) -> None:
+    def hit_me(self, player: Player, log: LogWindow) -> None:
 
         deck = self.deck
 
@@ -23,7 +22,7 @@ class Blackjack():
         card = deck.deal_card()
         print(player.name + " receives a " + str(card))
         player.hand.cards.append(card)
-        self.show_hand(player)
+        self.show_hand(player, log)
 
         # if player hand value > 21, the player is bust and removed from play
         if self.get_hand_value(player.hand.get_cards()) > 21:
@@ -31,10 +30,12 @@ class Blackjack():
             self.activeplayers.remove(player)
         return
 
-    def stand(self, player: Player) -> None:
+    def stand(self, player: Player, log: LogWindow) -> None:
         self.activeplayers.remove(player)
         player.didStand = True
-
+        action = player.name + " chose to stand."
+        print(action)
+        log.append_to_log(action)
         # if no more active players, the dealer calls
         if len(self.activeplayers) < 1:
             self.dealercall = True
@@ -83,17 +84,19 @@ class Blackjack():
             dealer.bust = True
         return
 
-    def show_hand(self, player: Player) -> None:
+    def show_hand(self, player: Player, log: LogWindow) -> None:
         player_hand = player.hand.get_cards()
 
         # dealer always hides one card until the end
         if player.isDealer:
-            print(player.name + " is showing " +
-                  str(player_hand[1:]) + " for a total value of " + str(self.get_hand_value(player_hand[1:])))
+            action = (player.name + " is showing " +
+                      str(player_hand[1:]) + " for a total value of " + str(self.get_hand_value(player_hand[1:])))
         else:
             # normal players always show all of their cards
-            print(player.name + " is showing " + str(player_hand) +
-                  " for a total value of " + str(self.get_hand_value(player_hand)))
+            action = (player.name + " is showing " + str(player_hand) +
+                      " for a total value of " + str(self.get_hand_value(player_hand)))
+        print(action)
+        log.append_to_log(action)
         return
 
     def get_hand_value(self, hand: Hand) -> int:
@@ -180,7 +183,7 @@ class Blackjack():
 
         return
 
-    def start_game(self):
+    def start_game(self, log: LogWindow):
 
         blackjack_deck = Deck()
         self.deck = blackjack_deck
@@ -192,7 +195,7 @@ class Blackjack():
 
         # all players show their hands
         for player in self.players:
-            self.show_hand(player)
+            self.show_hand(player, log)
             if player.isDealer == False:
                 self.activeplayers.append(player)
 

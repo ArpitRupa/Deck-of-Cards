@@ -1,6 +1,4 @@
-from distutils.log import Log
 import os
-from unicodedata import name
 import pygame
 from games.blackjack import Blackjack
 from textbox import Textbox
@@ -50,7 +48,7 @@ class DeckOfCards:
         self.coords_set: bool = False
         self.action_box = None
 
-        self.log: LogButton = LogButton(
+        self.log_button: LogButton = LogButton(
             name="Logs", text_size=60, center=(90, 850))
 
         self.game = None
@@ -183,7 +181,7 @@ class DeckOfCards:
                     self.game.players.append(self.player_dict[i])
 
             # start the game
-            self.game.start_game()
+            self.game.start_game(self.log_button.log_window)
 
             self.current_player = self.game.activeplayers[0]
             self.prev_player = self.game.activeplayers[1]
@@ -213,7 +211,7 @@ class DeckOfCards:
         # draw action box
         self.action_box.draw(window)
         # draw log button for game
-        self.log.draw(window)
+        self.log_button.draw(window, events=self.events)
 
         # run if there are players active outside of the dealer
 
@@ -239,7 +237,8 @@ class DeckOfCards:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     # check if mouse is currently over the hit button
                     if self.action_box.hit_button.hover:
-                        game.hit_me(self.current_player)
+                        game.hit_me(self.current_player,
+                                    self.log_button.log_window)
                         # update the screen if the player busts
                         self.current_player.display_name(window)
                         self.prev_player = self.current_player
@@ -249,13 +248,16 @@ class DeckOfCards:
 
                     # check if mouse is currently over the stand button
                     elif self.action_box.stand_button.hover:
-                        game.stand(self.current_player)
+                        game.stand(self.current_player,
+                                   self.log_button.log_window)
                         # update the screen when player stands
                         self.current_player.display_name(window)
                         self.prev_player = self.current_player
 
-                    elif self.log.hover:
-                        print("clicked Log")
+                    # check if log button clicked
+                    elif self.log_button.hover:
+                        self.log_button.handle_click()
+                        self.new_card = True
 
             if len(game.activeplayers) < 1:
                 self.new_card = True
@@ -265,6 +267,12 @@ class DeckOfCards:
             self.game.dealer_call()
             self.new_card = True
             self.game_over = True
+
+            for events in self.events:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.log_button.hover:
+                        self.log_button.handle_click()
+                        self.new_card = True
 
         return
 

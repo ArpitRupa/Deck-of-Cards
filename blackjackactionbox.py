@@ -1,6 +1,7 @@
 import pygame
 from button import Button
 from ui.uiconfig import create_text_surface, GREY
+from ui.gamewindow import Window
 
 
 class BlackjackActionBox():
@@ -23,15 +24,12 @@ class BlackjackActionBox():
 
         return surf
 
-    def draw_box_border(self, window) -> None:
-        # top-left down
-        pygame.draw.rect(window.window, "Black", (945, 700, 5, 188))
-        # bottom-left right
-        pygame.draw.rect(window.window, "Black", (945, 887, 245, 5))
-        # top-left right
-        pygame.draw.rect(window.window, "Black", (945, 700, 240, 5))
-        # top-right down
-        pygame.draw.rect(window.window, "Black", (1185, 700, 5, 188))
+    def draw_box_border(self, window: Window) -> None:
+        rect = self.background_surf.get_rect(center=(1070, 796))
+        rect = rect.inflate(3, 3)
+
+        pygame.draw.rect(window.window, "Black", rect, 5)
+
         return
 
     # updates player name
@@ -70,7 +68,7 @@ class BlackjackActionBox():
 
         return value
 
-    def draw(self, window) -> None:
+    def draw(self, window: Window) -> None:
 
         self.update_player_text()
 
