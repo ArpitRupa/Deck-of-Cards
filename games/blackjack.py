@@ -1,4 +1,3 @@
-from tkinter.messagebox import NO
 from core.hand import Hand
 from core.player import Player
 from core.deck import Deck
@@ -7,35 +6,47 @@ from logwindow import LogWindow
 
 class Blackjack():
 
-    def __init__(self) -> None:
+    def __init__(self, log: LogWindow) -> None:
         self.players: list[Player] = []
         self.activeplayers: list[Player] = []
         self.cardvalues: dict = {"J": 10, "Q": 10, "K": 10, "A": 11}
         self.dealercall: bool = False
         self.deck: Deck = None
+        self.log: LogWindow = log
+        self.winners: list = []
+        self.ties: list = []
+        self.losers: list = []
 
-    def hit_me(self, player: Player, log: LogWindow) -> None:
+    def hit_me(self, player: Player) -> None:
 
         deck = self.deck
 
         # deal card and show player hand
         card = deck.deal_card()
-        print(player.name + " receives a " + str(card))
+        action = player.name + " receives a " + str(card)
+        print(action)
+        self.log.append_to_log(action)
         player.hand.cards.append(card)
-        self.show_hand(player, log)
+
+        print(player.name + " current value:" +
+              str(self.get_hand_value(player.hand.get_cards())))
 
         # if player hand value > 21, the player is bust and removed from play
         if self.get_hand_value(player.hand.get_cards()) > 21:
+            action = player.name + " has bust."
+            print(action)
+            self.log.append_to_log(action)
             player.bust = True
             self.activeplayers.remove(player)
+            self.losers.append(player)
         return
 
-    def stand(self, player: Player, log: LogWindow) -> None:
+    def stand(self, player: Player) -> None:
         self.activeplayers.remove(player)
         player.didStand = True
         action = player.name + " chose to stand."
         print(action)
-        log.append_to_log(action)
+        self.log.append_to_log(action)
         # if no more active players, the dealer calls
         if len(self.activeplayers) < 1:
             self.dealercall = True
@@ -52,14 +63,19 @@ class Blackjack():
 
         dealer = self.players[dealerIndex]
         dealer_hand = dealer.hand.get_cards()
-        print(dealer.name + " shows hidden card. The card was a " +
-              str(dealer_hand[0]))
+        action = (dealer.name + " shows hidden card. The card was a " +
+                  str(dealer_hand[0]))
+        print(action)
+        self.log.append_to_log(action)
+
         print("Dealer's current hand: " + str(dealer_hand))
 
         dealer_active = True
         while dealer_active:
             dealer_value = self.get_hand_value(dealer_hand)
             print(dealer.name + "'s current value: " + str(dealer_value))
+            self.log.append_to_log(
+                dealer.name + "'s current value: " + str(dealer_value))
 
             # dealer must stand if hand value is greater than 16
             if dealer_value > 16 and dealer_value < 22:
@@ -69,22 +85,29 @@ class Blackjack():
             elif dealer_value < 16:
                 card = deck.deal_card()
                 dealer.hand.cards.append(card)
-                print("Dealer receives a " + str(card))
+                action = "Dealer receives a " + str(card)
+                print(action)
+                self.log.append_to_log(action)
                 print("Dealer's current hand: " + str(dealer_hand))
             else:
-                print("The dealer busts.")
+                action = "The dealer busts."
+                print(action)
+                self.log.append_to_log(action)
                 dealer.bust = True
                 return
 
-        print("Dealer's turn has concluded. Dealer's value is " +
-              str(self.get_hand_value(dealer_hand)))
+        action = ("Dealer's turn has concluded. Dealer's value is " +
+                  str(self.get_hand_value(dealer_hand)))
+        print(action)
+        self.log.append_to_log(action)
 
         if self.get_hand_value(dealer_hand) > 21:
             print("The dealer busts.")
+            self.log.append_to_log("The dealer busts.")
             dealer.bust = True
         return
 
-    def show_hand(self, player: Player, log: LogWindow) -> None:
+    def show_hand(self, player: Player) -> None:
         player_hand = player.hand.get_cards()
 
         # dealer always hides one card until the end
@@ -96,10 +119,10 @@ class Blackjack():
             action = (player.name + " is showing " + str(player_hand) +
                       " for a total value of " + str(self.get_hand_value(player_hand)))
         print(action)
-        log.append_to_log(action)
+        self.log.append_to_log(action)
         return
 
-    def get_hand_value(self, hand: Hand) -> int:
+    def get_hand_value(self, hand: list) -> int:
 
         total_val = 0
         # track # of aces to optimize 1 vs 11 value for card
@@ -127,10 +150,6 @@ class Blackjack():
 
     def check_winner(self) -> None:
 
-        winning_players = []
-        tie_players = []
-        losing_players = []
-
         players = []
 
         for player in self.players:
@@ -147,7 +166,10 @@ class Blackjack():
             dealer_hand = str(self.players[dealer_index].hand.get_cards())
             print("Dealer cards:" + dealer_hand)
             print("Dealer has bust, remaining players win!")
+            self.log.append_to_log("Dealer has bust, remaining players win!")
             print("Winners: " + str(players))
+            self.log.append_to_log("Winners: " + str(players))
+            self.winners = str(players)
 
             return
 
@@ -158,32 +180,32 @@ class Blackjack():
             print(player.name + " " + str(value))
 
             if value > dealer_value:
-                winning_players.append(player)
+                self.winners.append(player)
             elif value == dealer_value:
-                tie_players.append(player)
+                self.ties.append(player)
 
         for player in self.players:
-            if player not in winning_players and player not in tie_players:
-                losing_players.append(player)
+            if player not in self.winners and player not in self.ties and not player.isDealer:
+                self.losers.append(player)
 
         print("Game has concluded.")
 
-        if len(winning_players) == 0 and len(tie_players) == 0:
+        if len(self.winners) == 0 and len(self.ties) == 0:
             print("All players lose.")
             return
 
-        if len(winning_players) > 0:
-            print("Winners: " + str(winning_players))
+        if len(self.winners) > 0:
+            print("Winners: " + str(self.winners))
 
-        if len(tie_players) > 0:
-            print("Dealer ties with:" + str(tie_players))
+        if len(self.ties) > 0:
+            print("Dealer ties with:" + str(self.ties))
 
-        if len(losing_players) > 0:
-            print("Losers: " + str(losing_players))
+        if len(self.losers) > 0:
+            print("Losers: " + str(self.losers))
 
         return
 
-    def start_game(self, log: LogWindow):
+    def start_game(self):
 
         blackjack_deck = Deck()
         self.deck = blackjack_deck
@@ -195,7 +217,7 @@ class Blackjack():
 
         # all players show their hands
         for player in self.players:
-            self.show_hand(player, log)
+            self.show_hand(player)
             if player.isDealer == False:
                 self.activeplayers.append(player)
 

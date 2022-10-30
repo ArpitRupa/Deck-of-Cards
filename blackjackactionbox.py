@@ -75,16 +75,19 @@ class BlackjackActionBox():
         # draw border around action box
         self.draw_box_border(window)
 
+        # for loop for border effect
+        for i in range(20):
+            # display current player name
+            self.background_surf.blit(
+                self.current_player_surf, self.current_player_rect)
+
+            # display current value
+            self.background_surf.blit(self.value_surf, self.value_rect)
+
+            # display the action box background
+            window.window.blit(self.background_surf, (950, 702))
+
         # draw the hit and stand buttons
         self.hit_button.draw(window)
         self.stand_button.draw(window)
-
-        # display current player name
-        self.background_surf.blit(
-            self.current_player_surf, self.current_player_rect)
-
-        # display current value
-        self.background_surf.blit(self.value_surf, self.value_rect)
-        # display the action box background
-        window.window.blit(self.background_surf, (950, 702))
         return
