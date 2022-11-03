@@ -1,7 +1,7 @@
 import pygame
-from button import Button
+from ui.components.buttons.button import Button
 from ui.uiconfig import create_text_surface, GREY
-from ui.gamewindow import Window
+from ui.screens.gamewindow import Window
 
 
 class BlackjackActionBox():

@@ -5,7 +5,7 @@ from ui.uiconfig import WIDTH, HEIGHT
 
 class Window:
 
-    def __init__(self, name) -> None:
+    def __init__(self, name: str) -> None:
         self.width = WIDTH
         self.height = HEIGHT
         self.window = pygame.display.set_mode((self.width, self.height))
@@ -14,10 +14,7 @@ class Window:
 
         self.setup_window(name)
 
-    def setup_window(self, name):
-        pygame.display.set_caption("Deck of Cards")
+    def setup_window(self, name: str) -> None:
+        pygame.display.set_caption(name)
         pygame.display.set_icon(self.window_icon)
-        return
-
-    def set_variables(self):
         return
