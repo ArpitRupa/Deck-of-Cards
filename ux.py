@@ -1,5 +1,6 @@
 import os
 import pygame
+from playagainbutton import PlayAgainButton
 from games.blackjack import Blackjack
 from textbox import Textbox
 from blackjackactionbox import BlackjackActionBox
@@ -8,6 +9,8 @@ from ui.startwindow import start_window
 from ui.gamewindow import Window
 from ui.uiconfig import WIDTH, HEIGHT, scale, scale_aspect, GREY, create_text_surface
 from UIPlayer import UIPlayer
+from logbutton import LogButton
+from gameoverwindow import GameOverWindow
 
 
 class DeckOfCards:
@@ -47,13 +50,23 @@ class DeckOfCards:
         self.coords_set: bool = False
         self.action_box = None
 
-        self.game_started: bool = False
-        self.game = None
+        self.log_button: LogButton = LogButton(
+            name="Logs", text_size=60, center=(90, 850))
 
+        self.play_again_button: PlayAgainButton = PlayAgainButton(
+            "Play Again", text_size=75, center=(600, 800))
+
+        self.game = None
+        self.game_started: bool = False
         self.game_over: bool = False
 
-    # render the background
+        self.game_over_window: GameOverWindow = GameOverWindow()
 
+        self.rerender: bool = True
+
+        self.play_again: bool = False
+
+    # render the background
     def render_background(self, window):
         window.window.fill(GREY)
         window.window.blit(self.table, self.table_rect)
@@ -160,7 +173,7 @@ class DeckOfCards:
         if not self.game:
             self.render_background(window)
             self.render_title(window)
-            self.game = Blackjack()
+            self.game = Blackjack(self.log_button.log_window)
 
             # create and add dealer to the list of players
             self.player_dict[0] = UIPlayer("Dealer", dealer=True)
@@ -185,19 +198,32 @@ class DeckOfCards:
             self.action_box.update_value(
                 self.game.get_hand_value(player.hand.get_cards()))
 
-        if not self.game_over:
+        # re-render only if UI changes [new card/log window]
+        if self.rerender:
+            self.render_background(window)
+            self.render_title(window)
+
             for player in self.game.players:
-                player.create_UI_cards()
+
+                # display all player names
+                player.display_name(window)
+
+                # render the cards of the players
+                player.create_UI_cards(self.game.dealercall)
                 for card in player.ui_cards:
                     card.display_cards(window)
-            self.game_over = True
+            self.rerender = False
 
         game = self.game
 
+        # draw action box
         self.action_box.draw(window)
+        # draw log button for game
+        self.log_button.draw(window, events=self.events)
+
+        # run if there are players active outside of the dealer
 
         if not game.dealercall:
-
             if self.current_player == self.prev_player:
                 # update the index of current player
                 current_index = self.active_player + 1
@@ -212,25 +238,62 @@ class DeckOfCards:
                     player.name)
                 self.action_box.update_value(
                     self.game.get_hand_value(player.hand.get_cards()))
-                # false to re-render cards next loop
-                self.game_over = False
 
             self.active_player = game.activeplayers.index(self.current_player)
             # get the player action
             for event in self.events:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     # check if mouse is currently over the hit button
-                    if self.action_box.hover_hit:
+                    if self.action_box.hit_button.hover:
                         game.hit_me(self.current_player)
+                        # update the screen if the player busts
+                        self.current_player.display_name(window)
                         self.prev_player = self.current_player
 
+                        # True to re-render cards next loop
+                        self.rerender = True
+
                     # check if mouse is currently over the stand button
-                    elif self.action_box.hover_stand:
+                    elif self.action_box.stand_button.hover:
                         game.stand(self.current_player)
+                        # update the screen when player stands
+                        self.current_player.display_name(window)
                         self.prev_player = self.current_player
 
             if len(game.activeplayers) < 1:
+                self.rerender = True
                 game.dealercall = True
+
+        elif not self.game_over:
+            self.game.dealer_call()
+            self.rerender = True
+            self.game_over = True
+
+        # game over
+
+        if self.game_over:
+            winners_text = "Winners: " + "".join(str(game.winners))
+            tie_text = "Tie with Dealer: " + "".join(str(game.ties))
+            loser_text = "Losers: " + "".join(str(game.losers))
+
+            self.game_over_window.set_winner_text(winners_text)
+            self.game_over_window.set_tie_text(tie_text)
+            self.game_over_window.set_loser_text(loser_text)
+
+            self.game_over_window.draw(window)
+            for event in self.events:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.play_again_button.hover:
+                        self.play_again = self.play_again_button.handle_click(
+                            self.play_again_button)
+
+            self.play_again_button.draw(window)
+
+        for event in self.events:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.log_button.hover:
+                    self.log_button.handle_click()
+                    self.rerender = True
 
         return
 
@@ -264,6 +327,9 @@ def main():
         # else initalize the game (get some inputs)
         else:
             game.initalize_game(window)
+
+        if game.play_again:
+            game = DeckOfCards()
 
         pygame.display.update()
 

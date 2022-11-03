@@ -16,6 +16,7 @@ class UIPlayer(Player):
     def __init__(self, name="", dealer=False):
         super().__init__(name, dealer)
         self.name: str = name
+        self.name_color: tuple = (0, 0, 0)
         self.got_name: bool = False
         self.input_text: Textbox = None
         self.ui_name_surface = None
@@ -29,8 +30,10 @@ class UIPlayer(Player):
         self.player_number = num
 
     def update_name_surface(self) -> None:
-        self.ui_name_surface = create_text_surface(self.name, 40)
-        self.ui_name_rect = self.ui_name_surface.get_rect()
+        self.ui_name_surface = create_text_surface(
+            self.name, 40, color=self.name_color)
+        if not self.ui_name_rect:
+            self.ui_name_rect = self.ui_name_surface.get_rect()
 
     def set_ui_coordinates(self) -> None:
         match self.player_number:
@@ -55,21 +58,42 @@ class UIPlayer(Player):
                 #         case "6":
                 #         case "7":
 
-        # print(self.ui_name_rect.midbottom)
-        # print(self.ui_name_rect.midbottom[1])
-
     # displays the player name
+
     def display_name(self, screen: Window) -> None:
+
+        # change color of text if player stands
+        if self.didStand:
+            self.name_color = (230, 227, 80)
+            self.update_name_surface()
+
         screen.window.blit(self.ui_name_surface, self.ui_name_rect)
+
+        # put a line through the name if the player busts
+        if self.bust:
+            # get info to make red line across name
+            x = self.ui_name_rect.x
+            y = self.ui_name_rect.centery
+            width = self.ui_name_surface.get_width()
+
+            pygame.draw.rect(screen.window, "Red", (x, y, width, 5))
+
         return
 
     # create cards for the UI from the hand of the player
-    def create_UI_cards(self) -> None:
+    def create_UI_cards(self, dealer_call: bool) -> None:
         player_cards = self.hand.get_cards()
         for card in player_cards:
-            value = card.get_card_value()
-            suit = card.get_card_suit()
-            uiCard = UICard(value, suit)
+
+            # only render dealer's first card if the dealer has not called
+            is_dealer = self.player_number == 0
+            is_not_first_card = player_cards.index(card) > 0
+            if not dealer_call and is_dealer and is_not_first_card:
+                uiCard = UICard()
+            else:
+                value = card.get_card_value()
+                suit = card.get_card_suit()
+                uiCard = UICard(value, suit)
 
             # card x coordinate
             # only change for players 4 - 7
@@ -93,6 +117,7 @@ class UIPlayer(Player):
             else:
                 card_y = self.ui_name_rect.midbottom[1] - 30
 
+            # change placement of new card to the right of previous cards
             if player_cards.index(card) > 0:
                 card_x = card_x + \
                     (player_cards.index(card)*40)
