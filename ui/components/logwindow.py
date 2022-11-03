@@ -1,5 +1,5 @@
 import pygame
-from ui.gamewindow import Window
+from ui.screens.gamewindow import Window
 
 
 class LogWindow():

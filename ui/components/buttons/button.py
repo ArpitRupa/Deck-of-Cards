@@ -1,6 +1,6 @@
 import pygame
 from ui.uiconfig import GREY, create_text_surface
-from ui.gamewindow import Window
+from ui.screens.gamewindow import Window
 
 
 class Button():

@@ -1,8 +1,8 @@
 import pygame
 from ui.uiconfig import create_text_surface
-from button import Button
-from ui.gamewindow import Window
-from logwindow import LogWindow
+from ui.components.buttons.button import Button
+from ui.screens.gamewindow import Window
+from ui.components.logwindow import LogWindow
 
 
 class LogButton(Button):

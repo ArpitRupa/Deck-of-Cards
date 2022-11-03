@@ -5,22 +5,24 @@ from ui.uiconfig import WHITE, font_med
 
 class Textbox:
 
-    def __init__(self, x, y, width, height, color=WHITE, font_size=150, input_type=None) -> None:
+    def __init__(self, x: int, y: int, width: int, height: int, color=WHITE, font_size: int = 150, input_type=None, lower_bound: int = 1, upper_bound: int = 6) -> None:
 
-        self.text = ""
-        self.font_size = pygame.font.Font(None, font_size)
-        self.color = color
-        self.active = False
-        self.hovering = False
-        self.rect = self.make_rect(x, y, width, height)
-        self.surface = self.make_font_surface()
-        self.cursor = self.make_cursor()
-        self.enter_pressed = False
-        self.valid_enter = True
-        self.text_was_empty = False
-        self.input_type = input_type
+        self.text: str = ""
+        self.font_size: pygame.font.Font = pygame.font.Font(None, font_size)
+        self.color: tuple = color
+        self.active: bool = False
+        self.hovering: bool = False
+        self.rect: pygame.Rect = self.make_rect(x, y, width, height)
+        self.surface: pygame.Surface = self.make_font_surface()
+        self.cursor: pygame.rect = self.make_cursor()
+        self.enter_pressed: bool = False
+        self.valid_enter: bool = True
+        self.text_was_empty: bool = False
+        self.input_type: str = input_type
+        self.upper_bound: int = upper_bound
+        self.lower_bound: int = lower_bound
 
-    def make_rect(self, x, y, width, height):
+    def make_rect(self, x: int, y: int, width: int, height: int) -> None:
         text_rect = font_med.render(self.text, True, "Black").get_rect()
         text_rect.midbottom = (x, y)
         text_rect.width = width
@@ -37,7 +39,7 @@ class Textbox:
 
         return cursor
 
-    def handle_event(self, event):
+    def handle_event(self, event: pygame.event.Event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(pygame.mouse.get_pos()):
                 self.active = True
@@ -101,7 +103,7 @@ class Textbox:
         if len(self.text) > 0:
             if self.input_type is not None:
                 if self.input_type == "int":
-                    if self.text.isnumeric() and int(self.text) > 1 and int(self.text) < 8:
+                    if self.text.isnumeric() and int(self.text) > self.lower_bound and int(self.text) < self.upper_bound:
                         self.valid_enter = True
                     else:
                         self.text = ""

@@ -10,5 +10,5 @@ class Player():
         self.isDealer: bool = dealer
         self.didStand: bool = False
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (self.name)
