@@ -1,4 +1,4 @@
-from button import Button
+from ui.components.buttons.button import Button
 
 
 class PlayAgainButton(Button):

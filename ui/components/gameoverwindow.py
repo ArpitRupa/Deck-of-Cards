@@ -1,5 +1,5 @@
 import pygame
-from ui.gamewindow import Window
+from ui.screens.gamewindow import Window
 from ui.uiconfig import create_text_surface
 
 
@@ -9,9 +9,9 @@ class GameOverWindow():
         self.game_over_text: pygame.Surface = create_text_surface(
             "GAME OVER", 100, "Red")
         self.game_over_window = self.init_window()
-        self.winner_text: pygame.Surface
-        self.tie_text: pygame.Surface
-        self.loser_text: pygame.Surface
+        self.winner_text: pygame.Surface = ""
+        self.tie_text: pygame.Surface = ""
+        self.loser_text: pygame.Surface = ""
 
     def init_window(self) -> pygame.Surface:
         game_over_window = pygame.Surface((500, 400), flags=pygame.SRCALPHA)
@@ -43,8 +43,9 @@ class GameOverWindow():
         font = pygame.font.SysFont('', 40)
 
         self.render_line(self.winner_text, (w_x, w_y), font, "Green")
-        self.render_line(self.tie_text, (t_x, t_y), font, "Yellow")
         self.render_line(self.loser_text, (l_x, l_y), font, "Red")
+        if self.tie_text != "":
+            self.render_line(self.tie_text, (t_x, t_y), font, "Yellow")
 
     def render_line(self, text: str, start: tuple, font: pygame.font, color="Black") -> None:
 
