@@ -109,7 +109,7 @@ The UI is built off of Pygame. Most of the game logic is done in `start.py ` wit
 
 The program starts by providing the user with a splash screen that lets them select a game to play.
 
-<img src ="./screenshots/general/start_screen.png" alt="select_a_game" width = 700 >
+<img src ="./screenshots/general/Start_Screen.png" alt="select_a_game" width = 700 >
 
 
 
