@@ -125,7 +125,7 @@ The program than deviates from here to the repsective game UIs.
 
 Blackjack starts by showing 2 cards for each player except for the dealer which displays 1 card face down. The program then parses through the active players (those who have not selected "stand" and who have not bust) taking their game inputs from the "hit" and "stand" buttons on the bottom right of the screen.
 
-<img src ="./screenshots/blackjack/blackjack_start.png" alt="bj_start" width = 700 >
+<img src ="./screenshots/blackjack/BlackJack_start.png" alt="bj_start" width = 700 >
 
 As the game is played, player status (active, standing, busted) are shown through the player names. A red line through the name indicates that the player has bust, a yellow color font of the name indicates that the player selected to stand, and a black name with no red line indicates and active player.
 
